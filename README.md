@@ -1,5 +1,5 @@
 # Minterate: Client-Server Lending Platform
-<img width="512" alt="Logo" src="https://github.com/ShalevShar/Minterate-Client/assets/127881894/fe15dfdb-71e4-45d1-a253-16455594c2fb">
+<img width="256" alt="Logo" src="https://github.com/ShalevShar/Minterate-Client/assets/127881894/fe15dfdb-71e4-45d1-a253-16455594c2fb">
 
 ## About
 
