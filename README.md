@@ -12,6 +12,12 @@ Minterate is a client-server lending platform designed to facilitate lending tra
 - **Communication:** RESTful APIs
 - **Authentication:** JSON Web Tokens (JWT), Firebase Authentication
 
+  
+## Server
+<img width="252" alt="Screenshot 2024-07-01 at 20 54 12" src="https://github.com/ShalevShar/Minterate-Client/assets/127881894/516247e7-6964-423f-b169-c4e01baae07e">
+<img width="252" alt="Screenshot 2024-07-01 at 20 54 34" src="https://github.com/ShalevShar/Minterate-Client/assets/127881894/a9215cfa-21ab-4753-89f7-bcd828f20b73">
+<img width="252" alt="Screenshot 2024-07-01 at 20 54 52" src="https://github.com/ShalevShar/Minterate-Client/assets/127881894/8763f695-4596-4e99-a8e7-43f6f58c5e63">
+
 ## Features
 
 ### User Registration and Loan Interaction:
