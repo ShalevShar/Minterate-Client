@@ -78,7 +78,8 @@
     <p>2.1 The Borrower agrees to repay the Loan Amount along with accrued interest in equal monthly installments
         of <span id="monthlyPaymentAmount">[Enter Monthly Payment Amount]</span> commencing on <span
                 id="firstRepaymentDate">[Not yet determined]</span> and continuing on the same day of each
-        successive month thereafter until the Loan Amount is fully repaid.</p>
+        successive month thereafter until the Loan Amount is fully repaid.<br>
+        2.2 Both the Borrower and the Lender will be charged a service fee of <span id="serviceFee">[Service Fee Amount]</span>%</p>
 </div>
 
 <div class="section">
@@ -162,154 +163,152 @@
 </div>
 
 <script>
-        // To exit to MainActivity
-        function exitToMainActivity(signature) {
-            AndroidInterface.exitToMainActivity(signature);
+    // To exit to MainActivity
+    function exitToMainActivity(signature) {
+        AndroidInterface.exitToMainActivity(signature);
+    }
+
+
+    // To simply close the current activity
+    function closeActivity() {
+        AndroidInterface.closeActivity();
+    }
+
+    // To open the borrower's signature pad (conditionally)
+    function openBorrowerSignaturePad() {
+        if (AndroidInterface.isLender()) {
+            // Check if the current user is the lender
+            alert("Lender cannot sign as a borrower.");
+        } else {
+            openSignaturePad('borrowerSignatureCanvas', 'borrowerSignature');
+        }
+    }
+
+    // To save the borrower's signature (conditionally)
+    function saveBorrowerSignature() {
+        if (AndroidInterface.isLender()) {
+            // Check if the current user is the lender
+            alert("Lender cannot sign as a borrower.");
+        } else {
+            saveSignature('borrowerSignatureCanvas', 'borrowerSignature', 'borrowerDate');
+        }
+    }
+
+    function openSignaturePad(canvasId, signatureId) {
+        var canvas = document.getElementById(canvasId);
+        var signaturePad = new SignaturePad(canvas);
+    }
+
+    // Declare a global variable to store lender's signature data
+    var lenderSignatureData = null;
+
+    // To save the signature data globally
+    function saveSignature(canvasId, signatureId, dateId) {
+        var canvas = document.getElementById(canvasId);
+        var context = canvas.getContext("2d", { willReadFrequently: true });
+        var imageData = context.getImageData(0, 0, canvas.width, canvas.height).data;
+
+        // Check if the drawn signature is entirely transparent or white
+        var isBlank = Array.from(imageData).every(value => value === 0 || value === 255);
+
+        if (isBlank) {
+            alert("Please provide a valid signature before saving.");
+            return null; // Return null to indicate failure
         }
 
+        var dataURL = canvas.toDataURL();
+        var signatureDiv = document.getElementById(signatureId);
+        signatureDiv.innerHTML = '<img src="' + dataURL + '" alt="Signature">';
 
-        // To simply close the current activity
-        function closeActivity() {
-            AndroidInterface.closeActivity();
-        }
+        var dateDiv = document.getElementById(dateId);
+        dateDiv.innerText = new Date().toLocaleDateString();
 
-        // To open the borrower's signature pad (conditionally)
-        function openBorrowerSignaturePad() {
-            if (AndroidInterface.isLender()) {
-                // Check if the current user is the lender
-                alert("Lender cannot sign as a borrower.");
+        // Save the signature data globally
+        lenderSignatureData = dataURL;
+
+        return dataURL; // Return the data URL
+    }
+
+
+    function adjustSignaturePadDisplay() {
+        var isLender = AndroidInterface.isLender();
+        var isFinish = AndroidInterface.isFinish();
+        var lenderButton = document.getElementById('openLenderSignatureButton');
+        var lenderCanvas = document.getElementById('lenderSignatureCanvas');
+        var lenderSaveButton = document.getElementById('saveLenderSignatureButton');
+
+        var borrowerButton = document.getElementById('openBorrowerSignatureButton');
+        var borrowerCanvas = document.getElementById('borrowerSignatureCanvas');
+        var borrowerSaveButton = document.getElementById('saveBorrowerSignatureButton');
+
+        var saveContractButton = document.getElementById('saveContractButton');
+
+        if (isFinish){
+          // Hide borrower's signature elements
+            borrowerButton.style.display = 'none';
+            borrowerCanvas.style.display = 'none';
+            borrowerSaveButton.style.display = 'none';
+
+           // Hide lender's signature elements
+            lenderButton.style.display = 'none';
+            lenderCanvas.style.display = 'none';
+            lenderSaveButton.style.display = 'none';
+
+           // Hide save contract button
+            saveContractButton.style.display = 'none';
+
+        }else{
+            if (isLender) {
+            // Hide borrower's signature elements
+            borrowerButton.style.display = 'none';
+            borrowerCanvas.style.display = 'none';
+            borrowerSaveButton.style.display = 'none';
+
+            // Show lender's signature elements
+            lenderButton.style.display = 'block';
+            lenderCanvas.style.display = 'block';
+            lenderSaveButton.style.display = 'block';
             } else {
-                openSignaturePad('borrowerSignatureCanvas', 'borrowerSignature');
-            }
-        }
-
-        // To save the borrower's signature (conditionally)
-        function saveBorrowerSignature() {
-            if (AndroidInterface.isLender()) {
-                // Check if the current user is the lender
-                alert("Lender cannot sign as a borrower.");
-            } else {
-                saveSignature('borrowerSignatureCanvas', 'borrowerSignature', 'borrowerDate');
-            }
-        }
-
-        function openSignaturePad(canvasId, signatureId) {
-            var canvas = document.getElementById(canvasId);
-            var signaturePad = new SignaturePad(canvas);
-        }
-
-        // Declare a global variable to store lender's signature data
-        var lenderSignatureData = null;
-
-        // To save the signature data globally
-        function saveSignature(canvasId, signatureId, dateId) {
-            var canvas = document.getElementById(canvasId);
-            var context = canvas.getContext("2d");
-            var imageData = context.getImageData(0, 0, canvas.width, canvas.height).data;
-
-            // Check if the drawn signature is entirely transparent or white
-            var isBlank = Array.from(imageData).every(value => value === 0 || value === 255);
-
-            if (isBlank) {
-                alert("Please provide a valid signature before saving.");
-                return null; // Return null to indicate failure
-            }
-
-            var dataURL = canvas.toDataURL();
-            var signatureDiv = document.getElementById(signatureId);
-            signatureDiv.innerHTML = '<img src="' + dataURL + '" alt="Signature">';
-
-            var dateDiv = document.getElementById(dateId);
-            dateDiv.innerText = new Date().toLocaleDateString();
-
-            // Save the signature data globally
-            lenderSignatureData = dataURL;
-
-            return dataURL; // Return the data URL
-        }
-
-
-        function adjustSignaturePadDisplay() {
-            var isLender = AndroidInterface.isLender();
-            var isFinish = AndroidInterface.isFinish();
-            var lenderButton = document.getElementById('openLenderSignatureButton');
-            var lenderCanvas = document.getElementById('lenderSignatureCanvas');
-            var lenderSaveButton = document.getElementById('saveLenderSignatureButton');
-
-            var borrowerButton = document.getElementById('openBorrowerSignatureButton');
-            var borrowerCanvas = document.getElementById('borrowerSignatureCanvas');
-            var borrowerSaveButton = document.getElementById('saveBorrowerSignatureButton');
-
-            var saveContractButton = document.getElementById('saveContractButton');
-
-            if (isFinish){
-              // Hide borrower's signature elements
-                borrowerButton.style.display = 'none';
-                borrowerCanvas.style.display = 'none';
-                borrowerSaveButton.style.display = 'none';
-
-               // Hide lender's signature elements
+                // Hide lender's signature elements
                 lenderButton.style.display = 'none';
                 lenderCanvas.style.display = 'none';
                 lenderSaveButton.style.display = 'none';
 
-               // Hide save contract button
-                saveContractButton.style.display = 'none';
-
-            }else{
-                if (isLender) {
-                // Hide borrower's signature elements
-                borrowerButton.style.display = 'none';
-                borrowerCanvas.style.display = 'none';
-                borrowerSaveButton.style.display = 'none';
-
-                // Show lender's signature elements
-                lenderButton.style.display = 'block';
-                lenderCanvas.style.display = 'block';
-                lenderSaveButton.style.display = 'block';
-                } else {
-                    // Hide lender's signature elements
-                    lenderButton.style.display = 'none';
-                    lenderCanvas.style.display = 'none';
-                    lenderSaveButton.style.display = 'none';
-
-                    // Show borrower's signature elements
-                    borrowerButton.style.display = 'block';
-                    borrowerCanvas.style.display = 'block';
-                    borrowerSaveButton.style.display = 'block';
-                }
+                // Show borrower's signature elements
+                borrowerButton.style.display = 'block';
+                borrowerCanvas.style.display = 'block';
+                borrowerSaveButton.style.display = 'block';
             }
         }
+    }
 
-        function saveContract() {
-            var isLender = AndroidInterface.isLender();
-            if(isLender){
-                var lenderSignature = saveSignature('lenderSignatureCanvas', 'lenderSignature', 'lenderDate');
-                if (!lenderSignature) {
-                    alert("Lender's signature is required.");
-                } else {
-                    // Alert a success message (you can remove this in the final version)
-                    alert("Lender's signature was saved successfully");
+    function saveContract() {
+        var isLender = AndroidInterface.isLender();
+        if(isLender){
+            var lenderSignature = saveSignature('lenderSignatureCanvas', 'lenderSignature', 'lenderDate');
+            if (!lenderSignature) {
+                alert("Lender's signature is required.");
+            } else {
+                // Alert a success message (you can remove this in the final version)
+                alert("Lender's signature was saved successfully");
 
-                    // Perform any additional actions, such as sending the signature data to the backend
-                    exitToMainActivity(lenderSignature);
-                }
-            }else{
-                var borrowerSignature = saveSignature('borrowerSignatureCanvas', 'borrowerSignature', 'borrowerDate');
-                if (!borrowerSignature) {
-                    alert("Borrower's signature is required.");
-                } else {
-                    // Alert a success message (you can remove this in the final version)
-                    alert("Borrower's signature was saved successfully");
-
-                    // Perform any additional actions, such as sending the signature data to the backend
-                    exitToMainActivity(borrowerSignature);
-                }
+                // Perform any additional actions, such as sending the signature data to the backend
+                exitToMainActivity(lenderSignature);
             }
+        }else{
+            var borrowerSignature = saveSignature('borrowerSignatureCanvas', 'borrowerSignature', 'borrowerDate');
+            if (!borrowerSignature) {
+                alert("Borrower's signature is required.");
+            } else {
+                // Alert a success message (you can remove this in the final version)
+                alert("Borrower's signature was saved successfully");
 
-
+                // Perform any additional actions, such as sending the signature data to the backend
+                exitToMainActivity(borrowerSignature);
+            }
         }
-    </script>
+    }
+</script>
 </body>
 
 </html>
