@@ -2,7 +2,7 @@
 <img width="256" alt="Logo" src="https://github.com/ShalevShar/Minterate-Client/assets/127881894/fe15dfdb-71e4-45d1-a253-16455594c2fb">
 
 ## About
-
+ 
 Minterate is a client-server lending platform designed to facilitate lending transactions between borrowers and lenders. It employs a client-server architecture to handle data storage, processing, and communication between users.
 
 ## Technologies Used
